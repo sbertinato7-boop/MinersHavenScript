@@ -1,6 +1,3 @@
--- =============================
--- VENYX UI ORE TRACKER FOR MINER'S HAVEN
--- =============================
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
 local venyx = library.new("Prestige Hub", 5013109572)
 
@@ -31,9 +28,6 @@ local function formatNumber(num)
     return formatted .. (Suffixes[index] or "")
 end
 
--- =============================
--- THEME CONFIGURATION
--- =============================
 local themes = {
     Background = Color3.fromRGB(24, 24, 24),
     Glow = Color3.fromRGB(0, 0, 0),
@@ -43,11 +37,6 @@ local themes = {
     TextColor = Color3.fromRGB(255, 255, 255)
 }
 
--- =============================
--- GLOBAL VARIABLES
--- =============================
-
--- Box Management Variables
 local boxNames = {
     "Regular","Unreal","Inferno","Luxury","Red-Banded","Spectral",
     "Magnificent","Heavenly","Pumpkin","Festive","Birthday","Twitch",
@@ -60,7 +49,6 @@ local autoBoxLoop = nil
 local autoBoxesEnabled = false
 local boxesLoop = nil
 
--- Ore Tracking Variables
 local diagnosticMode = true
 local labelCount = 0
 local scanCount = 0
@@ -69,24 +57,17 @@ local oreTrackerEnabled = false
 local trackerLoop = nil
 local labelSize = 120
 
--- Ore Booster Variables
 local AutoUpgradeEnabled = false
 local boosterEnabled = false
 local factoryConnections = {}
 local processed = setmetatable({}, { __mode = "k" })
 
--- Industrial Mine Variables
 local usingIndustrialMine = false
 local industrialMineItem = nil
 
--- Player Variables
 local currentConveyorSpeed = 1
 local factoryWatchConn = nil
 local conveyorWarned = false
-
--- =============================
--- FURNACE AND UPGRADER LISTS
--- =============================
 
 local furnaceNames = {
     "Advanced Furnace","Aether Refinery","Aethereal Synthesizer","All Star Behemoth Cake","Ambrosia Forest",
@@ -129,21 +110,17 @@ local furnaceNames = {
     "Y","Yuge Furnace"
 }
 
--- Create furnace lookup table for performance
 local furnaceLookup = {}
 for _,name in ipairs(furnaceNames) do 
     furnaceLookup[name] = true 
 end
 
--- =============================
--- AUTO REMOTE CLICKER
--- =============================
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RemoteDrop = ReplicatedStorage:WaitForChild("RemoteDrop")
 
 local RemoteClickerEnabled = false
 local RemoteClickerLoop = nil
-local clickerDelay = 0.1 -- delay between clicks (seconds)
+local clickerDelay = 0.1
 
 local function startRemoteClicker()
     if RemoteClickerLoop then return end
@@ -166,9 +143,6 @@ local function stopRemoteClicker()
     print("[Remote Clicker] Disabled")
 end
 
--- =============================
--- BOX MANAGEMENT FUNCTIONS
--- =============================
 local function openBox(name)
     pcall(function()
         local remote = game:GetService("ReplicatedStorage"):WaitForChild("MysteryBox")
@@ -234,9 +208,6 @@ local function stopAutoBoxes()
     print("Auto Collect Boxes disabled")
 end
 
--- =============================
--- AUTO REBIRTH CORE LOGIC
--- =============================
 local autoRebirthEnabled = false
 local rebirthLoop
 local minSkips = 0
@@ -370,10 +341,6 @@ local function stopAutoRebirth()
     print("[AUTO REBIRTH] Stopped")
 end
 
--- =============================
--- ORE TRACKING FUNCTIONS
--- =============================
-
 local function debugPrint(message)
     if diagnosticMode then
         print("[ORE TRACKER DEBUG]", message)
@@ -463,13 +430,8 @@ local function stopOreTracker()
     print("Ore Tracker disabled")
 end
 
--- =============================
--- ORE PROCESSING SYSTEM (Based on second script method)
--- =============================
-
 local furnaceRefreshConnection = nil
 
--- Configuration
 local MoneyLoopables = {
     ["Large Ore Upgrader"] = {Cap = 50e+3, Effect = nil, MinVal = nil},
     ["Solar Large Upgrader"] = {Cap = 50e+3, Effect = nil, MinVal = nil},
@@ -491,35 +453,31 @@ local MoneyLoopables = {
     ["Ore Transistor"] = {Cap = 1e+30, Effect = nil, MinVal = 1e+24},
     ["Ore Transponder"] = {Cap = 1e+33, Effect = nil, MinVal = nil},
     ["Morning Star"] = {Cap = 1e+30, Effect = "Fire", MinVal = nil, MinWait = 1.5},
-    ["⭐ Celestial Morning Star ⭐"] = {Cap = 1e+30, Effect = "Fire", MinVal = nil, MinWait = 1.5},
+    ["â­ Celestial Morning Star â­"] = {Cap = 1e+30, Effect = "Fire", MinVal = nil, MinWait = 1.5},
     ["Red Giant"] = {Cap = 1e+60, Effect = "Fire", MinVal = nil, MinWait = 1.5},
-    ["⭐ Wholesome Red Giant ⭐"] = {Cap = 1e+60, Effect = "Fire", MinVal = nil, MinWait = 1.5},
+    ["â­ Wholesome Red Giant â­"] = {Cap = 1e+60, Effect = "Fire", MinVal = nil, MinWait = 1.5},
     ["Catalyzed Star"] = {Cap = 1e+60, Effect = "Fire", MinVal = nil, MinWait = 1.5},
     ["Neutron Star"] = {Cap = 1e+72, Effect = "Fire", MinVal = nil, MinWait = 1.5},
-    ["⭐ Wholesome Neutron Star ⭐"] = {Cap = 1e+72, Effect = "Fire", MinVal = nil, MinWait = 1.5},
+    ["â­ Wholesome Neutron Star â­"] = {Cap = 1e+72, Effect = "Fire", MinVal = nil, MinWait = 1.5},
     ["Blue Supergiant"] = {Cap = 1e+90, Effect = "Fire", MinVal = nil, MinWait = 1.5},
-    ["⭐ Hypergiant Blue Supergiant ⭐"] = {Cap = 1e+90, Effect = "Fire", MinVal = nil, MinWait = 1.5},
+    ["â­ Hypergiant Blue Supergiant â­"] = {Cap = 1e+90, Effect = "Fire", MinVal = nil, MinWait = 1.5},
 }
 
 local EffectRemovers = {"Wild Spore", "Deadly Spore", "Azure Spore", "The Death Cap"}
 local ResettersNames = {"Tesla Resetter","Tesla Refuter","Black Dwarf","Void Star","The Ultimate Sacrifice","The Final Upgrader","Daestrophe"}
 
--- Variables
 local tycoonFolder = nil
 local furnaceItem = nil
 local indMineItem = nil
 
--- Helper Functions
 local function findPlayerTycoon()
     local player = game.Players.LocalPlayer
     if not player then return nil end
     
-    -- Method 1: Try using PlayerTycoon.Value (from second script)
     if player:FindFirstChild("PlayerTycoon") and player.PlayerTycoon.Value then
         return player.PlayerTycoon.Value
     end
     
-    -- Method 2: Fallback to searching workspace.Tycoons (original method)
     local tycoons = workspace:FindFirstChild("Tycoons")
     if not tycoons then return nil end
     
@@ -559,7 +517,6 @@ local function getFurnaceItems()
             end
         end
         
-        -- Look for Industrial Mines (improved detection - check for "Industrial" OR "Mine" in name)
         if usingIndustrialMine and item:FindFirstChild("Model") then
             local itemName = item.Name:lower()
             if (itemName:find("industrial") or itemName:find("mine")) and item.Model:FindFirstChild("Drop") and item.Model:FindFirstChild("Lava") then
@@ -595,22 +552,20 @@ local function startFurnaceAutoDetection()
             if tycoonFolder then
                 getFurnaceItems()
                 
-                -- Also listen for new items being placed
                 for _, item in ipairs(tycoonFolder:GetChildren()) do
                     if not item:GetAttribute("_OreBoosterWatched") and item:FindFirstChild("Model") then
                         item:SetAttribute("_OreBoosterWatched", true)
                         
-                        -- Watch for model changes that might indicate a furnace
                         item.Model.ChildAdded:Connect(function(child)
                             if child.Name == "Lava" and not child:FindFirstChild("TeleportSend") then
-                                task.wait(0.1) -- Small delay to ensure everything is loaded
+                                task.wait(0.1)
                                 getFurnaceItems()
                             end
                         end)
                     end
                 end
             end
-            task.wait(2) -- Check every 2 seconds
+            task.wait(2)
         end
     end)
     
@@ -630,18 +585,15 @@ local function sendOreToIndustrialMine(ore)
     
     local success = false
     pcall(function()
-        -- Stop ore movement
         ore.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
         ore.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
         ore.Velocity = Vector3.new(0, 0, 0)
         
-        -- Mark this ore as already processed by Industrial Mine
         ore:SetAttribute("ProcessedByIndustrialMine", true)
         
         if industrialMineItem:FindFirstChild("Model") and industrialMineItem.Model:FindFirstChild("Lava") then
             local lava = industrialMineItem.Model.Lava
             
-            -- Try multiple teleportation methods for reliability
             for i = 1, 5 do
                 if ore and ore.Parent then
                     ore.CFrame = lava.CFrame + Vector3.new(math.random(-2,2), 3, math.random(-2,2))
@@ -660,16 +612,13 @@ local function sendOreToIndustrialMine(ore)
 end
 
 local function isCoalMineOre(ore)
-    -- Check if the ore came from a coal mine by looking at its properties or parent folder
     if not ore or not ore.Parent then return false end
     
-    -- Skip ores that have already been processed by Industrial Mine
     if ore:GetAttribute("ProcessedByIndustrialMine") then
         print("[Industrial Mine] Ore already processed by Industrial Mine, skipping:", ore.Name)
         return false
     end
     
-    -- Method 1: Check if ore has properties typical of coal mine ores (Industrial Coal Mine produces $0 ores)
     if ore:FindFirstChild("Cash") then
         local cashValue = ore.Cash.Value
         if cashValue == 0 then
@@ -678,15 +627,12 @@ local function isCoalMineOre(ore)
         end
     end
     
-    -- Method 2: Check if ore name suggests it's from coal mine
     local oreName = ore.Name:lower()
     if oreName:find("coal") then
         print("[Industrial Mine] Detected coal ore by name:", ore.Name)
         return true
     end
     
-    -- Method 3: Check if it's a very low value ore that might benefit from industrial processing
-    -- But exclude ores that might be processed industrial mine outputs
     if ore:FindFirstChild("Cash") and ore.Cash.Value > 0 and ore.Cash.Value < 1000 then
         print("[Industrial Mine] Detected low-value ore for industrial processing:", ore.Name, "Value:", ore.Cash.Value)
         return true
@@ -702,7 +648,6 @@ local function boostOre(ore)
         if not boosterEnabled then break end
         if not ore or not ore.Parent then break end
         
-        -- Skip money loopables and resetters for regular boost
         if MoneyLoopables[item.Name] or table.find(ResettersNames, item.Name) then continue end
         
         if item:FindFirstChild("ItemId") and item:FindFirstChild("Model") and item.Model:FindFirstChild("Upgrade") then
@@ -721,16 +666,13 @@ end
 local function resetOre(ore)
     if not ore or not ore.Parent or not tycoonFolder then return end
     
-    -- Find available resetters - FIXED LOGIC
     local resetters = {}
     
-    -- Check each resetter individually and add to list if found
     local dae = tycoonFolder:FindFirstChild("Daestrophe")
     local sac = tycoonFolder:FindFirstChild("The Final Upgrader") or tycoonFolder:FindFirstChild("The Ultimate Sacrifice")
     local star = tycoonFolder:FindFirstChild("Void Star") or tycoonFolder:FindFirstChild("Black Dwarf")
     local tes = tycoonFolder:FindFirstChild("Tesla Resetter") or tycoonFolder:FindFirstChild("Tesla Refuter")
     
-    -- Add resetters to list in priority order
     if dae then table.insert(resetters, dae) end
     if sac then table.insert(resetters, sac) end
     if star then table.insert(resetters, star) end
@@ -741,37 +683,31 @@ local function resetOre(ore)
         print(" - " .. resetter.Name)
     end
     
-    -- Boost ore before resetters
     boostOre(ore)
     
-    -- Process each resetter
     for _, resetter in ipairs(resetters) do
         if not ore or not ore.Parent or not boosterEnabled then break end
         
         print("[DEBUG] Processing with:", resetter.Name)
         
-        -- Check if resetter has proper model structure
         if resetter:FindFirstChild("Model") and resetter.Model:FindFirstChild("Upgrade") then
-            for i = 1, 5 do -- Increased attempts for better reliability
+            for i = 1, 5 do
                 if ore and ore.Parent then
                     pcall(function()
-                        -- Stop ore movement first
                         ore.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                         ore.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         ore.Velocity = Vector3.new(0, 0, 0)
                         
-                        -- Teleport to resetter
                         ore.CFrame = resetter.Model.Upgrade.CFrame
                         print("[DEBUG] Teleported ore to", resetter.Name, "attempt", i)
                     end)
-                    task.wait(0.02) -- Slightly longer wait for processing
+                    task.wait(0.02)
                 else
                     break
                 end
             end
             
-            -- Boost ore again after each resetter
-            task.wait(0.1) -- Wait for resetter to process
+            task.wait(0.1)
             if ore and ore.Parent then
                 boostOre(ore)
             end
@@ -789,7 +725,6 @@ local function processMoneyLoopable(ore)
     local moneyLoopItem = nil
     local protectItem = nil
     
-    -- Find money loopable
     for itemName, _ in pairs(MoneyLoopables) do
         local item = tycoonFolder:FindFirstChild(itemName)
         if item then 
@@ -798,7 +733,6 @@ local function processMoneyLoopable(ore)
         end
     end
     
-    -- Find effect remover
     for _, removerName in ipairs(EffectRemovers) do
         local item = tycoonFolder:FindFirstChild(removerName)
         if item then 
@@ -852,10 +786,8 @@ local function startOreBoost(ore)
         pcall(function()
             print("[DEBUG] Starting ore boost for:", ore.Name)
             
-            -- Anchor ore initially
             ore.Anchored = true
             
-            -- Wait for Cash value to load
             repeat 
                 task.wait(0.01) 
             until ore:FindFirstChild("Cash") or not ore.Parent
@@ -866,34 +798,29 @@ local function startOreBoost(ore)
             
             print("[DEBUG] Ore has Cash value:", ore.Cash.Value)
             
-            -- Check if using Industrial Mine mode and if this is a coal mine ore
             if usingIndustrialMine and isCoalMineOre(ore) and industrialMineItem then
                 print("[DEBUG] Sending to Industrial Mine")
                 if sendOreToIndustrialMine(ore) then
-                    return -- Exit here, industrial mine will create new ore
+                    return
                 end
             end
             
-            -- Process money loopable if enabled
             if AutoUpgradeEnabled then
                 print("[DEBUG] Processing money loopables")
                 processMoneyLoopable(ore)
             end
             
-            -- Process resetters if enabled
             if boosterEnabled then
                 print("[DEBUG] Processing resetters")
                 resetOre(ore)
             end
             
-            -- Final boost before selling
             task.wait(0.1)
             if ore and ore.Parent then
                 boostOre(ore)
             end
             
-            -- Sell the ore
-            task.wait(0.2) -- Give time for final processing
+            task.wait(0.2)
             if ore and ore.Parent then
                 print("[DEBUG] Selling ore with final value:", ore.Cash and ore.Cash.Value or "NO CASH")
                 sellOre(ore)
@@ -920,7 +847,7 @@ function StartOreBooster()
     end
     
     getFurnaceItems()
-    startFurnaceAutoDetection() -- Start auto-detection
+    startFurnaceAutoDetection()
     
     local droppedParts = workspace:FindFirstChild("DroppedParts")
     if not droppedParts then
@@ -940,13 +867,11 @@ function StartOreBooster()
         warn("[OreBooster] Player ore folder not found in DroppedParts")
     end
     
-    -- Also watch for new items being added to tycoon (like placing new furnaces or industrial mines)
     factoryConnections["tycoonWatcher"] = tycoonFolder.ChildAdded:Connect(function(newItem)
         if newItem:FindFirstChild("Model") then
-            task.wait(0.1) -- Wait for model to fully load
+            task.wait(0.1)
             newItem:SetAttribute("_OreBoosterWatched", true)
             
-            -- Check if it's a furnace or industrial mine and update immediately
             if newItem.Model:FindFirstChild("Lava") and not newItem.Model.Lava:FindFirstChild("TeleportSend") then
                 getFurnaceItems()
             end
@@ -954,7 +879,6 @@ function StartOreBooster()
                 getFurnaceItems()
             end
             
-            -- Watch for future changes to this item's model
             newItem.Model.ChildAdded:Connect(function(child)
                 if child.Name == "Lava" and not child:FindFirstChild("TeleportSend") then
                     task.wait(0.1)
@@ -970,10 +894,9 @@ end
 function StopOreBooster()
     if not boosterEnabled then return end
     boosterEnabled = false
-    stopFurnaceAutoDetection() -- Stop auto-detection
+    stopFurnaceAutoDetection()
     detachAllFactoryConnections()
     
-    -- Clear attributes we set
     if tycoonFolder then
         for _, item in ipairs(tycoonFolder:GetChildren()) do
             if item:GetAttribute("_OreBoosterWatched") then
@@ -985,9 +908,6 @@ function StopOreBooster()
     print("[OreBooster] Stopped.")
 end
 
--- =============================
--- PLAYER MANAGEMENT FUNCTIONS
--- =============================
 local function findPlayerFactory()
     local tycoons = workspace:FindFirstChild("Tycoons")
     if not tycoons then return nil end
@@ -1059,28 +979,20 @@ function UpdateConveyorSpeed(speed)
     end
 end
 
--- =============================
--- UNLOAD FUNCTION
--- =============================
 local function unloadEverything()
-    -- Disable all toggles
     oreTrackerEnabled, autoBoxesEnabled, autoOpenSelected, autoOpenAll, AutoUpgradeEnabled, boosterEnabled = false, false, false, false, false, false
     
-    -- Cancel loops
     task.wait(0.15)
     for _, loop in pairs({trackerLoop, boxesLoop, autoBoxLoop}) do pcall(task.cancel, loop) end
     trackerLoop, boxesLoop, autoBoxLoop = nil, nil, nil
     
-    -- Stop booster
     pcall(StopOreBooster)
     
-    -- Clear cache and remove labels
     processed = setmetatable({}, {__mode = "k"})
     for _, obj in ipairs(workspace:GetDescendants()) do
         if obj:IsA("BillboardGui") and obj.Name == "_OreLabel" then pcall(obj.Destroy, obj) end
     end
     
-    -- Destroy UI
     if venyx then
         for _, method in pairs({"Destroy", "DestroyGui"}) do pcall(venyx[method], venyx) end
         for _, component in pairs({venyx.gui, venyx.window, venyx.main}) do 
@@ -1088,7 +1000,6 @@ local function unloadEverything()
         end
     end
     
-    -- Remove orphaned GUIs
     for _, gui in ipairs(game:GetService("CoreGui"):GetChildren()) do
         if gui:IsA("ScreenGui") then
             for _, d in ipairs(gui:GetDescendants()) do
@@ -1100,12 +1011,9 @@ local function unloadEverything()
     end
     
     venyx, library = nil, nil
-    print("[Prestige Hub] ✅ Fully unloaded and all connections disconnected.")
+    print("[Prestige Hub] âœ… Fully unloaded and all connections disconnected.")
 end
 
--- =============================
--- UI CREATION
--- =============================
 local mainPage = venyx:addPage("Main", 5012544693)
 local oreSection = mainPage:addSection("Ore Tracking")
 local boosterSection = mainPage:addSection("Ore Booster")
@@ -1126,10 +1034,6 @@ local playerSection = playerTab:addSection("Player Controls | Reapplies on chara
 
 local ShopTab = venyx:addPage("Shop", 5012544693)
 local TeleportTab = venyx:addPage("Teleport", 5012544693)
-
--- =============================
--- UI CONTROLS - AUTO REBIRTH
--- =============================
 
 rebirthSection:addToggle("Enable Auto Rebirth", false, function(state)
     if state then
@@ -1163,9 +1067,6 @@ RemoteSection:addSlider("Remote Click Delay", 0, 0, 2, function(value)
     print("[Remote Clicker] Delay set to:", value)
 end)
 
--- =============================
--- UI CONTROLS - ORE TRACKING
--- =============================
 oreSection:addToggle("Ore Tracker", nil, function(value)
     oreTrackerEnabled = value
     if value then startOreTracker() else stopOreTracker() end
@@ -1194,9 +1095,6 @@ oreSection:addButton("Unload Tracker", function()
     venyx:Notify("Ore Tracker", "Completely unloaded!")
 end)
 
--- =============================
--- UI CONTROLS - ORE BOOSTER
--- =============================
 boosterSection:addToggle("Ore Booster", false, function(value)
     if value then
         StartOreBooster()
@@ -1219,10 +1117,10 @@ end)
 boosterSection:addToggle("Using Industrial Mine", false, function(value)
     usingIndustrialMine = value
     if value then
-        getFurnaceItems() -- Refresh to detect industrial mines
+        getFurnaceItems()
         venyx:Notify("Industrial Mine", "Coal mine ores will now be sent to Industrial Mine first!")
     else
-        industrialMineItem = nil -- Clear the industrial mine reference
+        industrialMineItem = nil
         venyx:Notify("Industrial Mine", "Industrial Mine mode disabled.")
     end
 end)
@@ -1262,33 +1160,23 @@ boosterSection:addButton("Debug Industrial Mine", function()
     end
 end)
 
--- =============================
--- UI CONTROLS - CONVEYORS
--- =============================
 conveyorSection:addSlider("Conveyor Speed", currentConveyorSpeed, 1, 20, function(value)
     UpdateConveyorSpeed(value)
 end)
 
--- =============================
--- AUTO LAYOUT SYSTEM (WITH LIFE VALUE DETECTION)
--- =============================
-
--- Variables
 local selectedLayout1 = nil
 local selectedLayout2 = nil
-local layoutDelay = 0 -- delay before first layout loads
-local layout2Delay = 5 -- delay before second layout loads
+local layoutDelay = 0
+local layout2Delay = 5
 local autoLayoutEnabled = false
 local lifeValue = nil
 
--- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Layouts = ReplicatedStorage:WaitForChild("Layouts")
 local DestroyAll = ReplicatedStorage:WaitForChild("DestroyAll")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- ========== CORE FUNCTIONS ==========
 local function destroyAllItems()
     DestroyAll:InvokeServer()
     print("[AUTO LAYOUT] Destroyed all items.")
@@ -1305,16 +1193,12 @@ local function runAutoLayoutLoop()
     if not autoLayoutEnabled or not selectedLayout1 then return end
 
     task.spawn(function()
-        -- Step 1: Withdraw everything
         destroyAllItems()
 
-        -- Step 2: Wait for the configured delay BEFORE loading the first layout
         task.wait(layoutDelay)
 
-        -- Step 3: Load the first layout
         loadLayout(selectedLayout1)
 
-        -- Step 4: If a second layout is selected, wait then load it
         if selectedLayout2 then
             task.wait(layout2Delay)
             destroyAllItems()
@@ -1324,7 +1208,6 @@ local function runAutoLayoutLoop()
     end)
 end
 
--- ========== LIFE VALUE REBIRTH DETECTION ==========
 local function setupLifeListener()
     local leaderstats = player:WaitForChild("leaderstats")
     lifeValue = leaderstats:WaitForChild("Life")
@@ -1337,10 +1220,8 @@ local function setupLifeListener()
     end)
 end
 
--- ========== INITIAL SETUP ==========
 setupLifeListener()
 
--- ========== UI HOOKS ==========
 layoutManagerSection:addButton("Withdraw All", function()
     destroyAllItems()
 end)
@@ -1350,7 +1231,7 @@ layoutManagerSection:addDropdown("Auto Layout", {"Layout 1", "Layout 2", "Layout
     print("[AUTO LAYOUT] Selected Layout 1:", selectedLayout1)
 
     if autoLayoutEnabled then
-        runAutoLayoutLoop() -- Immediately trigger auto-layout on selecting Layout 1
+        runAutoLayoutLoop()
     end
 end)
 
@@ -1359,7 +1240,7 @@ layoutManagerSection:addToggle("Enable Auto Layout", false, function(state)
     print("[AUTO LAYOUT] Auto layout enabled:", autoLayoutEnabled)
 
     if autoLayoutEnabled then
-        runAutoLayoutLoop() -- Run once on enabling
+        runAutoLayoutLoop()
     end
 end)
 
@@ -1373,7 +1254,6 @@ secondLayoutSection:addDropdown("Auto 2nd Layout", {"Layout 1", "Layout 2", "Lay
     print("[AUTO LAYOUT] Selected Layout 2:", selectedLayout2)
 
     if autoLayoutEnabled and selectedLayout1 then
-        -- If we already have a first layout selected and auto layout is on, run loop immediately
         runAutoLayoutLoop()
     end
 end)
@@ -1383,18 +1263,16 @@ secondLayoutSection:addSlider("2nd Layout Delay", 5, 0, 30, function(value)
     print("[AUTO LAYOUT] Layout 2 delay set to:", layout2Delay)
 end)
 
--- === Layout Steal / Load integration (venyx) - Updated Version ===
 local playerDropdown
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HTTP = game:GetService("HttpService")
 
--- safe remotes (may be nil if names changed)
 local HasItem = ReplicatedStorage:FindFirstChild("HasItem")
-local DestroyAll = ReplicatedStorage:FindFirstChild("DestroyAll") or ReplicatedStorage:FindFirstChild("Withdraw") -- fallback names
+local DestroyAll = ReplicatedStorage:FindFirstChild("DestroyAll") or ReplicatedStorage:FindFirstChild("Withdraw")
 local PlaceItem = ReplicatedStorage:FindFirstChild("PlaceItem")
-local buyItem = ReplicatedStorage:FindFirstChild("BuyItem") or ReplicatedStorage:FindFirstChild("BuyItemFromShop") -- fallback
+local buyItem = ReplicatedStorage:FindFirstChild("BuyItem") or ReplicatedStorage:FindFirstChild("BuyItemFromShop")
 local ItemsFolder = ReplicatedStorage:FindFirstChild("Items")
 
 local Player = Players.LocalPlayer
@@ -1407,17 +1285,13 @@ local function safeNotify(title, text)
     end
 end
 
--- Updated item finding function based on working code
 local function findItemByName(name)
     if not ItemsFolder then return nil end
-    -- try direct child by name first
     local child = ItemsFolder:FindFirstChild(name)
     if child then return child end
-    -- fallback: search by ItemId property if name doesn't match
     for _, v in ipairs(ItemsFolder:GetChildren()) do
         if v:FindFirstChild("ItemId") then
             if tostring(v.Name) == tostring(name) then return v end
-            -- sometimes stolen layout has names/IDs mismatch: check numeric id match
             if tonumber(name) and tonumber(v.ItemId.Value) == tonumber(name) then
                 return v
             end
@@ -1426,7 +1300,6 @@ local function findItemByName(name)
     return nil
 end
 
--- New function to find item by ID (from working code)
 local function findItemById(id)
     if not ItemsFolder then return nil end
     for _, v in ipairs(ItemsFolder:GetChildren()) do
@@ -1437,22 +1310,19 @@ local function findItemById(id)
     return nil
 end
 
--- build player list for dropdown
 local playerNames = {}
 for _, plr in ipairs(Players:GetPlayers()) do
     table.insert(playerNames, plr.Name)
 end
 
 local selectedPlayer = nil
-local stolenLayout = nil -- table of layout data
+local stolenLayout = nil
 
--- create dropdown with your venyx section variable (layoutStealSection must exist)
 local playerDropdown = layoutStealSection:addDropdown("Pick a player", playerNames, function(selected)
     selectedPlayer = selected
     print("[LAYOUT STEAL] Selected player:", selected)
 end)
 
--- update dropdown as players join/leave
 Players.PlayerAdded:Connect(function(plr)
     table.insert(playerNames, plr.Name)
     if playerDropdown and playerDropdown.update then
@@ -1472,7 +1342,6 @@ Players.PlayerRemoving:Connect(function(plr)
     end
 end)
 
--- Updated capture function based on working code
 local function captureLayoutFromBase(tycoon)
     local data = {}
     local basePart = tycoon:FindFirstChild("Base")
@@ -1486,7 +1355,6 @@ local function captureLayoutFromBase(tycoon)
         if item:FindFirstChild("ItemId") and item:FindFirstChild("Hitbox") then
             local hitbox = item.Hitbox
 
-            -- relative to the base part's position
             local relPos = hitbox.CFrame.Position - basePart.Position
             local lookVector = hitbox.CFrame.LookVector
 
@@ -1530,7 +1398,6 @@ layoutStealSection:addButton("Steal Layout", function()
         return
     end
 
-    -- Check if player has BaseDataLoaded (from working code)
     if not plr:FindFirstChild("BaseDataLoaded") then
         safeNotify("Layout Steal", "Player is not fully loaded in. Please wait or select another player.")
         return
@@ -1556,7 +1423,6 @@ layoutStealSection:addButton("Steal Layout", function()
     print("[LAYOUT STEAL] Stolen layout for "..selectedPlayer..": items="..tostring(#data))
 end)
 
--- Updated load function based on working code
 local function loadStolenLayout(layoutData)
     local me = Players.LocalPlayer
     if not me then
@@ -1581,7 +1447,6 @@ local function loadStolenLayout(layoutData)
         return
     end
 
-    -- withdraw everything first
     if DestroyAll and DestroyAll:IsA("RemoteFunction") then
         pcall(function() DestroyAll:InvokeServer() end)
     elseif DestroyAll and DestroyAll:IsA("RemoteEvent") then
@@ -1590,7 +1455,7 @@ local function loadStolenLayout(layoutData)
         warn("[Layout Load] DestroyAll remote not found or unknown type.")
     end
 
-    wait(0.5) -- Give time for withdrawal
+    wait(0.5)
 
     local failed = {}
     local placedCount = 0
@@ -1604,16 +1469,13 @@ local function loadStolenLayout(layoutData)
                     return
                 end
 
-                -- Calculate position exactly like working code
                 local tycoonBase = myBase
                 local relativePos = Vector3.new(itemData.Position[1], itemData.Position[2], itemData.Position[3])
                 local position = tycoonBase.Position + relativePos
                 local lookVector = Vector3.new(itemData.Position[4], itemData.Position[5], itemData.Position[6])
                 local coordinateFrame = CFrame.new(position, position + (lookVector * 5))
 
-                -- Check item type and handle accordingly (from working code)
                 if realItem.ItemType.Value >= 1 and realItem.ItemType.Value < 5 then
-                    -- Shop item - needs to be bought
                     local moneyVal = me.PlayerGui and me.PlayerGui:FindFirstChild("GUI") and me.PlayerGui.GUI:FindFirstChild("Money")
                     local currentMoney = (moneyVal and tonumber(moneyVal.Value)) or 0
                     local cost = (realItem:FindFirstChild("Cost") and realItem.Cost.Value) or 0
@@ -1635,7 +1497,6 @@ local function loadStolenLayout(layoutData)
                         table.insert(failed, realItem.Name.." (Insufficient money)")
                     end
                 else
-                    -- Regular item - check if owned
                     local hasCount = 0
                     if HasItem and HasItem:IsA("RemoteFunction") then
                         pcall(function() hasCount = HasItem:InvokeServer(realItem.ItemId.Value) end)
@@ -1653,12 +1514,12 @@ local function loadStolenLayout(layoutData)
                     end
                 end
                 
-                wait(0.1) -- Small delay between placements
+                wait(0.1)
             end)
         end)
     end
 
-    wait(3) -- Give time for all spawned functions to complete
+    wait(3)
 
     if #failed > 0 then
         safeNotify("Layout Load", "Loaded with "..tostring(#failed).." issues. Check console for details.")
@@ -1671,7 +1532,6 @@ local function loadStolenLayout(layoutData)
     end
 end
 
--- load stolen layout button - updated
 layoutStealSection:addButton("Load Stolen Layout", function()
     if not stolenLayout then
         safeNotify("Layout Load", "No stolen layout stored. Use 'Steal Layout' first.")
@@ -1681,7 +1541,6 @@ layoutStealSection:addButton("Load Stolen Layout", function()
     loadStolenLayout(stolenLayout)
 end)
 
--- Add button to load layout from clipboard
 layoutStealSection:addButton("Load Layout from Clipboard", function()
     local success, clipboardData = pcall(function()
         if getclipboard then
@@ -1711,14 +1570,10 @@ layoutStealSection:addButton("Load Layout from Clipboard", function()
     loadStolenLayout(layoutData)
 end)
 
--- =============================
--- UI CONTROLS - TELEPORTS
--- =============================
-
 local TeleportSection = TeleportTab:addSection("Teleport To NPC'S")
 
 local npcLocations = {
-    ["Wizard"] = CFrame.new(-146.7, 219.5, 209.64), -- placeholder coords
+    ["Wizard"] = CFrame.new(-146.7, 219.5, 209.64),
     ["Spook McDooks"] = CFrame.new(-356.009765625, 58.21588897705078, 1329.711669921875),
     ["Fargield"] = CFrame.new(-325.82, 102.571, 533.412),
     ["John Doe"] = CFrame.new(-723.939453125, 40.55, -34.37),
@@ -1759,16 +1614,12 @@ TeleportSection:addButton("Teleport to My Factory", function()
         local char = player.Character or player.CharacterAdded:Wait()
         local hrp = char:WaitForChild("HumanoidRootPart")
 
-        hrp.CFrame = base.CFrame + Vector3.new(0, 10, 0) -- spawn slightly above base
+        hrp.CFrame = base.CFrame + Vector3.new(0, 10, 0)
         print("[TELEPORT] Teleported to your factory.")
     else
         warn("[TELEPORT] Could not find your factory.")
     end
 end)
-
--- =============================
--- UI CONTROLS - SHOP
--- =============================
 
 local automationSection = ShopTab:addSection("WILL SPEND RP (I didn't add EVERY blueprint, but there are 60+)") 
 
@@ -1784,7 +1635,7 @@ automationSection:addButton("Buy All Blueprints", function()
     for _, id in ipairs(blueprintIDs) do
         local args = {"type:buyblueprint", id}
         remote:InvokeServer(unpack(args))
-        task.wait(0.1) -- small delay to avoid flooding
+        task.wait(0.1)
     end
     venyx:Notify("Blueprint AutoBuyer", "Attempted to buy all listed blueprints.")
 end)
@@ -1818,21 +1669,15 @@ end
 for name, gui in pairs(shopGUIs) do
     shopMenus:addButton("Open " .. name, function()
         if name:find("Click Again to Close") then
-            -- Toggle visibility manually for these menus
             gui.Visible = not gui.Visible
             print("[SHOP] Toggled:", name, "->", gui.Visible and "OPEN" or "CLOSED")
         else
-            -- Normal open (X button should work)
             enableCloseButton(gui)
             gui.Visible = true
             print("[SHOP] Opened:", name)
         end
     end)
 end
-
--- =============================
--- UI CONTROLS - PLAYER
--- =============================
 
 local player = game.Players.LocalPlayer
 local playerSpeed = 16
@@ -1878,9 +1723,6 @@ playerSection:addToggle("Anti-AFK", false, function(state)
     end
 end)
 
--- =============================
--- UI CONTROLS - BOXES
--- =============================
 boxSection:addToggle("Auto Collect Boxes", false, function(value)
     autoBoxesEnabled = value
     if value then
@@ -1911,9 +1753,6 @@ boxSection:addToggle("Auto Open All Boxes", false, function(v)
     if v then startAutoBoxLoop() else stopAutoBoxLoop() end
 end)
 
--- =============================
--- UI CONTROLS - THEME
--- =============================
 local theme = venyx:addPage("Theme", 5012544693)
 local colors = theme:addSection("Colors")
 for themeName, color in pairs(themes) do
@@ -1922,19 +1761,12 @@ for themeName, color in pairs(themes) do
     end)
 end
 
--- =============================
--- UI CONTROLS - SETTINGS
--- =============================
 local settings = venyx:addPage("Settings", 5012544693)
 local controlSection = settings:addSection("Script Controls")
 
 controlSection:addButton("Unload Script", function()
     unloadEverything()
 end)
-
--- =============================
--- FINALIZATION
--- =============================
 
 venyx:SelectPage(venyx.pages[1], true)
 print("[Prestige Hub] Loaded with Industrial Mine support.")
