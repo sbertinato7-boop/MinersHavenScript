@@ -6,8 +6,8 @@ local UserInputService = game:GetService("UserInputService")
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     if input.KeyCode == Enum.KeyCode.RightShift then
-        if venyx and venyx.gui then
-            venyx.gui.Enabled = not venyx.gui.Enabled
+        if venyx and venyx.toggle then
+            venyx:toggle()
         end
     end
 end)
